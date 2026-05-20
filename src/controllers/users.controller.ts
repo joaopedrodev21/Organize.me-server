@@ -1,11 +1,11 @@
-import { type Request, type Response } from "express";
+import { type NextFunction, type Request, type Response } from "express";
 import { UserRepository } from "../repositories/user.repository.js"
 import { updateUserSchema } from "../schemas/user.schema.js";
 
 const userRepository = new UserRepository();
 
 export class UserController {
-    async getMe(req: Request, res: Response){
+    async getMe(req: Request, res: Response, next: NextFunction){
         try {
             const userId = req.user!.id;
             const user = await userRepository.getById(userId);
@@ -19,12 +19,10 @@ export class UserController {
             return res.json(user);
 
         } catch (error: any) {
-            return res.status(500).json({
-            message: "Erro interno do servidor"
-            });
+            return next(error);
         }
     }
-    async updateMe(req: Request, res: Response){
+    async updateMe(req: Request, res: Response, next: NextFunction){
         try {
             const userId = req.user!.id;
             const userExists = await userRepository.getById(userId);
@@ -45,19 +43,17 @@ export class UserController {
             );
             return res.json(user);
         } catch (error: any) {
-            return res.status(400).json({
-            message: error.errors?.[0]?.message || "Dados inválidos"
-            });
+            return next(error);
         }
     }
-    async deleteMe(req: Request, res: Response){
+    async deleteMe(req: Request, res: Response, next: NextFunction){
         try {
             const userId = req.user!.id;
 
             await userRepository.delete(userId)
             return res.status(204).send()
-        } catch (error) {
-            res.status(500).json({ message: "Erro interno do servidor" });
+        } catch (error: any) {
+            return next(error);
         }
     }
 }

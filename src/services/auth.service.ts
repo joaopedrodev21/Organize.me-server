@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { type SignOptions } from "jsonwebtoken";
 import { UserRepository } from "../repositories/user.repository.js";
 import { AppError } from "../utils/app.error.js";
 
@@ -24,7 +24,7 @@ export class AuthService {
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new AppError("JWT_SECRET não configurado", 500);
 
-    const token = jwt.sign({ sub: String(user.id), email: user.email }, secret, { expiresIn: '1h'});
+    const token = jwt.sign({ sub: String(user.id), email: user.email }, secret, { expiresIn: "1h" });
 
     const { passwordHash: _, ...safeUser } = user;
     return { token, user: safeUser };

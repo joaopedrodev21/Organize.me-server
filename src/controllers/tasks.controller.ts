@@ -1,4 +1,4 @@
-import { type Request, type Response } from "express";
+import { type NextFunction ,type Request, type Response } from "express";
 import { TaskRepository } from "../repositories/task.repository.js";
 import { createTaskSchema, updateTaskSchema } from "../schemas/task.schema.js";
 import { listTasksQuerySchema } from "../schemas/task.schema.js";
@@ -6,7 +6,7 @@ import { listTasksQuerySchema } from "../schemas/task.schema.js";
 const taskRepository = new TaskRepository();
 
 export class TaskController {
-  async getAll(req: Request, res: Response) {
+  async getAll(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.id;
       
@@ -25,11 +25,11 @@ export class TaskController {
       });
       return res.json(result);
     } catch (error: any) {
-      return res.status(500).json({ message: error.message });
+      return next(error);
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const validatedData = createTaskSchema.parse(req.body);
       const userId = req.user!.id;
@@ -54,7 +54,7 @@ export class TaskController {
     }
   }
 
-  async getById(req: Request, res: Response) {
+  async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const taskId = Number(req.params.id);
       const userId = req.user!.id;
@@ -74,7 +74,7 @@ export class TaskController {
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
       const taskId = Number(req.params.id);
       const userId = req.user!.id;
@@ -112,7 +112,7 @@ export class TaskController {
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
       const taskId = Number(req.params.id);
       const userId = req.user!.id;
@@ -133,7 +133,7 @@ export class TaskController {
 
       return res.status(204).send();
     } catch (error) {
-      return res.status(500).json({ message: "Erro interno do servidor" });
+      return next(error);
     }
   }
 }
