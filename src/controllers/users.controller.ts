@@ -1,23 +1,14 @@
 import { type NextFunction, type Request, type Response } from "express";
-import { UserRepository } from "../repositories/user.repository.js"
 import { updateUserSchema } from "../schemas/user.schema.js";
+import { UsersService } from "../services/users.service.js";
 
-const userRepository = new UserRepository();
+const userService = new UsersService();
 
 export class UserController {
     async getMe(req: Request, res: Response, next: NextFunction){
         try {
-            const userId = req.user!.id;
-            const user = await userRepository.getById(userId);
-
-            if(!user){
-                return res.status(404).json({
-                    message: "Usuário não encontrado"
-                });
-            }
-
+            const user = await userService.getMe(req.user!.id);
             return res.json(user);
-
         } catch (error: any) {
             return next(error);
         }
@@ -25,22 +16,11 @@ export class UserController {
     async updateMe(req: Request, res: Response, next: NextFunction){
         try {
             const userId = req.user!.id;
-            const userExists = await userRepository.getById(userId);
-
-            if(!userExists){
-                return res.status(400).json({
-                    message: "Usuário não encontrado"
-                });
-            }
-
             const validatedData = updateUserSchema.parse(req.body);
-            const updateData: any = {};
-            if (validatedData.name !== undefined) updateData.name = validatedData.name;
-            if (validatedData.email !== undefined) updateData.email = validatedData.email;
-            const user = await userRepository.update(
-                userId,
-                updateData,
-            );
+            const updateData: {name?: string; email?: string} = {};
+            if(validatedData.name !== undefined) updateData.name = validatedData.name;
+            if(validatedData.email !== undefined) updateData.email = validatedData.email;
+            const user = await userService.updateMe(userId, updateData);
             return res.json(user);
         } catch (error: any) {
             return next(error);
@@ -48,9 +28,7 @@ export class UserController {
     }
     async deleteMe(req: Request, res: Response, next: NextFunction){
         try {
-            const userId = req.user!.id;
-
-            await userRepository.delete(userId)
+            await userService.deleteMe(req.user!.id);
             return res.status(204).send()
         } catch (error: any) {
             return next(error);

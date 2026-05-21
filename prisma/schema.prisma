@@ -37,7 +37,7 @@ model Task {
   done      Boolean   @default(false)
   priority  Priority  @default(LOW)
   userId    Int
-  user      User      @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   dueDate DateTime?
   createdAt DateTime  @default(now())

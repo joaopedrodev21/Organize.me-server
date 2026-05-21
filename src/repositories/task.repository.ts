@@ -31,7 +31,7 @@ export class TaskRepository {
         const { userId, done, priority, page, limit = 10, sortBy = "createdAt", order = "desc" } = params;
         const where: Prisma.TaskWhereInput = { userId, ...(done !== undefined ? { done } : {}), ...(priority ? { priority } : {}) };
 
-        const [itens, total] = await Promise.all([
+        const [items, total] = await Promise.all([
             prisma.task.findMany({
                 where,
                 orderBy: { [sortBy]: order },
@@ -40,6 +40,6 @@ export class TaskRepository {
             }),
             prisma.task.count({ where })
         ])
-        return { itens, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+        return { items, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
     }; 
 }

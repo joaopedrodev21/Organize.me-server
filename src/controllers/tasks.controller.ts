@@ -24,7 +24,7 @@ export class TaskController {
         ...(query.priority !== undefined ? { priority: query.priority } : {}),
       });
       return res.json(result);
-    } catch (error: any) {
+    } catch (error) {
       return next(error);
     }
   }

@@ -15,4 +15,14 @@ export class UsersService {
 
     return userRepository.update(userId, data);
   }
+  async getMe(userId: number) {
+     const user = await userRepository.getById(userId);
+     if(!user) throw new AppError("Usuário não encontrado", 404);
+     return user;
+  }
+  async deleteMe(userId: number) {
+    const user = await userRepository.getById(userId);
+    if (!user) throw new AppError("Usuário não encontrado", 404);
+    return userRepository.delete(userId);
+  }
 }
