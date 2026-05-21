@@ -15,18 +15,21 @@ Zod
 
 - Funcionalidades:
 
+Autenticação
+Registrar usuário com email e senha
+Login com email e senha (JWT)
+
 Usuários
-Criar usuário
-Listar usuários
-Buscar usuário por ID
-Atualizar usuário
-Remover usuário
+Buscar perfil do usuário autenticado
+Atualizar perfil do usuário autenticado
+Remover conta do usuário autenticado
+
 Tarefas
 Criar tarefa vinculada a um usuário
-Listar tarefas
-Buscar tarefa por ID
-Atualizar tarefa
-Remover tarefa
+Listar tarefas do usuário autenticado
+Buscar tarefa por ID (somente do próprio usuário)
+Atualizar tarefa (somente do próprio usuário)
+Remover tarefa (somente do próprio usuário)
 Marcar como concluída ou pendente
 Definir prioridade:
 HIGH
@@ -60,6 +63,7 @@ npm install
 Crie um arquivo .env na raiz:
 
 DATABASE_URL="postgresql://usuario:senha@localhost:5432/nome_do_banco"
+JWT_SECRET="seu_segredo_super_seguro"
 🗄️ Banco de dados
 
 Execute as migrations:
@@ -79,12 +83,15 @@ Servidor rodando em:
 
 http://localhost:3000
 📮 Rotas principais
+Auth
+POST   /auth/register
+POST   /auth/login
+
 Usuários
-POST   /users
-GET    /users
-GET    /users/:id
-PUT    /users/:id
-DELETE /users/:id
+GET    /users/me
+PUT    /users/me
+DELETE /users/me
+
 Tarefas
 POST   /tasks
 GET    /tasks
@@ -107,7 +114,6 @@ Versionamento com Git
 Frontend com React
 Filtros de tarefas
 Dashboard visual
-Autenticação JWT
 Deploy online
 👨‍💻 Autor
 

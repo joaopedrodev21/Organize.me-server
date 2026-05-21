@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const createTaskSchema = z.object({
   title: z.string().min(1, "Título é obrigatório"),
-  userId: z.number().int().positive("userId deve ser um número positivo"),
   priority: z.enum(["LOW", "HIGH"]).optional().default("LOW"),
   done: z.boolean().optional().default(false),
   description: z.string().optional(),
@@ -23,4 +22,12 @@ export const updateTaskSchema = z.object({
   data.dueDate !== undefined,
 {
   message: "Envie ao menos um campo para atualizar"
+});
+export const listTasksQuerySchema = z.object({
+  done: z.enum(["true", "false"]).optional(),
+  priority: z.enum(["LOW", "HIGH"]).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+  sortBy: z.enum(["createdAt", "dueDate", "priority"]).default("createdAt"),
+  order: z.enum(["asc", "desc"]).default("desc"),
 });

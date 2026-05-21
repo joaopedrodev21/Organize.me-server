@@ -1,97 +1,37 @@
-import { type Request, type Response } from "express";
-import { UserRepository } from "../repositories/user.repository.js"
-import { createUserSchema } from "../schemas/user.schema.js"
+import { type NextFunction, type Request, type Response } from "express";
 import { updateUserSchema } from "../schemas/user.schema.js";
+import { UsersService } from "../services/users.service.js";
 
-const userRepository = new UserRepository();
+const userService = new UsersService();
 
 export class UserController {
-    async getAll(req: Request, res: Response){
-        const users = await userRepository.getAll();
-        res.json(users);
-    };
-    async create(req: Request, res: Response) {
+    async getMe(req: Request, res: Response, next: NextFunction){
         try {
-            const validatedData = createUserSchema.parse(req.body);
-
-            const user = await userRepository.create(validatedData);
-
-            return res.status(201).json(user);
-
-        } catch (error: any) {
-            return res.status(400).json({
-            message: error.errors?.[0]?.message || "Dados inválidos"
-            });
-        }
-    }
-    async getById(req: Request, res: Response){
-        try {
-            const userId = Number(req.params.id);
-
-            if(isNaN(userId)){
-                return res.status(400).json({
-                    message: "ID inválido"
-                });
-            }
-            const user = await userRepository.getById(userId);
-
-            if(!user){
-                return res.status(404).json({
-                    message: "Usuário não encontrado"
-                })
-            }
+            const user = await userService.getMe(req.user!.id);
             return res.json(user);
-        } catch (error) {
-            res.status(500).json({ message: "Erro interno do servidor" });
+        } catch (error: any) {
+            return next(error);
         }
     }
-    async update(req: Request, res: Response){
+    async updateMe(req: Request, res: Response, next: NextFunction){
         try {
-            const userId = Number(req.params.id)
-            
-            if(isNaN(userId)){
-                return res.status(400).json({
-                    message: "ID inválido"
-                });
-            }
-
-            const userExists = await userRepository.getById(userId);
-
-            if(!userExists){
-                return res.status(404).json({
-                    message: "Usuário não encontrado"
-                });
-            }
-
+            const userId = req.user!.id;
             const validatedData = updateUserSchema.parse(req.body);
-            const updateData: any = {};
-            if (validatedData.name !== undefined) updateData.name = validatedData.name;
-            if (validatedData.email !== undefined) updateData.email = validatedData.email;
-            const user = await userRepository.update(
-                userId,
-                updateData,
-            );
+            const updateData: {name?: string; email?: string} = {};
+            if(validatedData.name !== undefined) updateData.name = validatedData.name;
+            if(validatedData.email !== undefined) updateData.email = validatedData.email;
+            const user = await userService.updateMe(userId, updateData);
             return res.json(user);
         } catch (error: any) {
-            return res.status(400).json({
-            message: error.errors?.[0]?.message || "Dados inválidos"
-            });
+            return next(error);
         }
     }
-    async delete(req: Request, res: Response){
+    async deleteMe(req: Request, res: Response, next: NextFunction){
         try {
-            const userId = Number(req.params.id);
-
-            if(isNaN(userId)){
-                return res.status(400).json({
-                    message: "ID inválido"
-                });
-            }
-
-            await userRepository.delete(userId)
+            await userService.deleteMe(req.user!.id);
             return res.status(204).send()
-        } catch (error) {
-            res.status(500).json({ message: "Erro interno do servidor" });
+        } catch (error: any) {
+            return next(error);
         }
     }
 }
