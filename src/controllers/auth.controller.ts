@@ -1,6 +1,7 @@
 import { type NextFunction, type Request, type Response } from 'express';
-import { registerSchema, loginSchema } from '../schemas/auth.schema.js';
+import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas/auth.schema.js';
 import { AuthService } from '../services/auth.service.js';
+import { ca } from 'zod/locales';
 
 const authService = new AuthService();
 
@@ -31,5 +32,23 @@ export class AuthController {
         catch(error: any){
             return next(error);
         } 
+    }
+    async forgotPassword(req: Request, res: Response, next: NextFunction){
+        try{
+            const validatedData = forgotPasswordSchema.parse(req.body);
+            await authService.forgotPassword(validatedData.email);
+            return res.json({ message: "Se o email existir, você receberá um link de recuperação." });
+        }catch(error: any){
+            return next(error);
+        }
+    }
+    async resetPassword(req: Request, res: Response, next: NextFunction){
+        try{
+            const validatedData = resetPasswordSchema.parse(req.body);
+            await authService.resetPassword(validatedData.token, validatedData.password);
+            return res.json({ message: "Senha redefinida com sucesso." });
+        }catch(error: any){
+            return next(error);
+        }
     }
 }
