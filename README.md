@@ -29,6 +29,7 @@ Este projeto permite:
 - Registrar usuário com email e senha
 - Login com email e senha
 - Geração de token JWT
+- Recuperação de senha via email com token temporário (`forgot-password` / `reset-password`)
 
 ### Usuários
 - Buscar perfil do usuário autenticado (`/users/me`)
@@ -125,6 +126,8 @@ http://localhost:3000
 ### Auth
 - `POST /auth/register`
 - `POST /auth/login`
+- `POST /auth/forgot-password` — solicita link de recuperação (envia email com token)
+- `POST /auth/reset-password` — redefine a senha usando o token recebido por email
 
 ### Usuários
 - `GET /users/me`
@@ -150,6 +153,50 @@ Exemplo:
 
 ```txt
 GET /tasks?done=false&priority=HIGH&page=1&limit=10&sortBy=dueDate&order=asc
+```
+
+---
+
+## 🔐 Recuperação de senha
+
+### Fluxo
+1. Usuário solicita recuperação em `POST /auth/forgot-password` informando o email
+2. Sistema gera um token aleatório, armazena no banco com expiração de 1 hora e envia um email com link de redefinição
+3. Usuário clica no link, informa nova senha e envia para `POST /auth/reset-password`
+4. Sistema valida o token, verifica se não expirou e atualiza a senha
+
+### Requisições
+
+**Solicitar recuperação:**
+```json
+POST /auth/forgot-password
+{
+  "email": "usuario@email.com"
+}
+
+// Resposta:
+{ "message": "Se o email existir, você receberá um link de recuperação." }
+```
+
+**Redefinir senha:**
+```json
+POST /auth/reset-password
+{
+  "token": "token_recebido_por_email",
+  "password": "novaSenha123"
+}
+
+// Resposta:
+{ "message": "Senha redefinida com sucesso." }
+```
+
+### Variáveis de ambiente necessárias
+
+```env
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+SMTP_USER=seuemail@gmail.com
+SMTP_PASS=sua_senha_de_app
 ```
 
 ---
