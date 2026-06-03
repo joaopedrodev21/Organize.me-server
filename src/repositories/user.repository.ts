@@ -29,4 +29,7 @@ export class UserRepository {
     delete(id: number){
         return prisma.user.delete({ where: {id}, select: safeUserSelect })
     }
+    getByResetToken(token: string) {
+        return prisma.user.findFirst({ where: { resetToken: token } })
+    }
 }

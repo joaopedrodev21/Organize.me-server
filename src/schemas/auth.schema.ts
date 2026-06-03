@@ -10,7 +10,7 @@ export const registerSchema = z.object({
         .email("Email inválido"),
     password: z
         .string()
-        .min(8, "Senha precisa ter no mínimo 8 caracteres") 
+        .min(8, "Senha precisa ter no mínimo 8 caracteres"),
 })
 
 export const loginSchema = z.object({
@@ -19,5 +19,16 @@ export const loginSchema = z.object({
         .email("Email inválido"),
     password: z
         .string()
-        .min(8, "Senha precisa ter no mínimo 8 caracteres")
+        .min(8, "Senha precisa ter no mínimo 8 caracteres"),
+})
+
+export const forgotPasswordSchema = z.object({
+    email: z
+        .string()
+        .email("Email inválido"),
+})
+
+export const resetPasswordSchema = z.object({
+    token: z.string().min(1, "Token é obrigatório"),
+    password: z.string().min(8, "Senha precisa ter no mínimo 8 caracteres"),
 })

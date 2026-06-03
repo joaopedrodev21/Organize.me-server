@@ -1,0 +1,19 @@
+{
+  "usuarios_exemplo": {
+    "joao": {
+      "name": "João Silva",
+      "email": "joao@email.com",
+      "password": "senha12345"
+    },
+    "maria": {
+      "name": "Maria Oliveira",
+      "email": "maria@email.com",
+      "password": "minhasenha"
+    },
+    "carlos": {
+      "name": "Carlos Souza",
+      "email": "carlos@email.com",
+      "password": "carlos1234"
+    }
+  }
+}
