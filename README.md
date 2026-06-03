@@ -1,4 +1,4 @@
-# Task Manager API
+# Organize.me API
 
 REST API para gerenciamento de tarefas desenvolvida com **Node.js**, **TypeScript**, **Express**, **Prisma ORM** e **PostgreSQL**.
 
@@ -73,8 +73,8 @@ src/
 ### 1) Clone o repositório
 
 ```bash
-git clone https://github.com/joaopedrodev21/Manager-tasks-server.git
-cd Manager-tasks-server
+git clone https://github.com/joaopedrodev21/Organize.me-server.git
+cd Organize.me-server
 ```
 
 ### 2) Instale as dependências

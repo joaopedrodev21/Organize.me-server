@@ -56,7 +56,7 @@ export class AuthService {
     const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
 
     await transporter.sendMail({
-      from: '"Manager Tasks" <noreply@managertasks.com>',
+      from: '"Organize.me" <noreply@managertasks.com>',
       to: user.email,
       subject: "Recuperação de Senha",
       html: `
@@ -77,5 +77,4 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await userRepository.update(user.id, { passwordHash, resetToken: null, resetTokenExp: null });
   }
-
 }
