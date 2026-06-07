@@ -55,8 +55,10 @@ export class AuthService {
 
     const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
 
+    const fromEmail = process.env.SMTP_USER || "noreply@gmail.com";
+
     await transporter.sendMail({
-      from: '"Organize.me" <noreply@managertasks.com>',
+      from: `"Organize.me" <${fromEmail}>`,
       to: user.email,
       subject: "Recuperação de Senha",
       html: `
