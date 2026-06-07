@@ -53,7 +53,7 @@ export class AuthService {
       },
     });
 
-    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
 
     const fromEmail = process.env.SMTP_USER || "noreply@gmail.com";
 
