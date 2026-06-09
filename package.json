@@ -21,7 +21,6 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.3.0",
     "@types/nodemailer": "^8.0.0",
-    "@vercel/node": "^5.8.12",
     "cors": "^2.8.6",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
