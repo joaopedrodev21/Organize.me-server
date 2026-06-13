@@ -1,0 +1,86 @@
+# ============================================
+# docker-compose.yml - Ambiente Local Completo
+# ============================================
+#
+# Docker Compose = orquestrador de containers
+# Com ele você sobe a aplicação E o banco juntos com 1 comando só!
+#
+# O Compose lê esse arquivo e cria os containers na mesma rede,
+# permitindo que eles se comuniquem.
+#
+# Comando para usar:
+#   docker compose up -d    (sobe tudo em background)
+#   docker compose down     (para e remove tudo)
+#   docker compose logs -f  (ver logs em tempo real)
+# ============================================
+
+services:  # Define os serviços (containers) que vão rodar
+
+  # ---------- SERVIÇO: banco de dados ----------
+  db:
+    # Imagem oficial do PostgreSQL 16
+    image: postgres:16-alpine
+    # Alpine = versão mais leve, ideal para containers
+    
+    container_name: organize-me-db  # Nome do container pra identificar fácil
+    
+    # Variáveis de ambiente para configurar o PostgreSQL
+    # O banco de dados, usuário e senha que serão criados
+    environment:
+      POSTGRES_USER: organize_user
+      POSTGRES_PASSWORD: organize_pass
+      POSTGRES_DB: organize_me_db
+    
+    # Mapeia a porta do container para sua máquina
+    # "5432:5432" = porta_local:porta_container
+    # Assim você pode conectar no banco pelo seu computador também
+    ports:
+      - "5432:5432"
+    
+    # Volume = disco persistente
+    # Dados do banco ficam salvos mesmo se o container reiniciar
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    
+    # Verifica se o banco está realmente pronto
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U organize_user -d organize_me_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------- SERVIÇO: aplicação Node ----------
+  app:
+    # Builda a imagem usando o Dockerfile que criamos
+    build:
+      context: .  # Define a pasta atual como contexto do build
+      dockerfile: Dockerfile
+    
+    container_name: organize-me-app
+    
+    # Depende do banco (só sobe depois do db estar pronto)
+    depends_on:
+      db:
+        condition: service_healthy  # Espera o healthcheck passar
+    
+    # Porta: local:container
+    ports:
+      - "3000:3000"
+    
+    # Variáveis de ambiente para a aplicação
+    # Aqui você pode sobrescrever o .env para o ambiente local
+    environment:
+      # A URL DEVE usar o nome do serviço "db" como host!
+      # O Docker Compose cria um DNS interno com os nomes dos serviços
+      DATABASE_URL: "postgresql://organize_user:organize_pass@db:5432/organize_me_db"
+      PORT: "3000"
+      JWT_SECRET: "dev-secret-key-nao-use-em-producao"
+      JWT_EXPIRES_IN: "1h"
+      CLIENT_URL: "http://localhost:5173"
+    
+    # Recarregar se o app cair (sempre reiniciar)
+    restart: unless-stopped
+
+# Volumes persistentes precisam ser declarados aqui
+volumes:
+  pgdata:  # Dados do PostgreSQL
