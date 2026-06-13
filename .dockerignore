@@ -1,0 +1,43 @@
+# ============================================
+# .dockerignore - O que NÃO vai para o container
+# ============================================
+# 
+# Assim como o .gitignore, o .dockerignore evita enviar
+# arquivos desnecessários para o Docker durante o build.
+# 
+# Isso acelera o build e evita problemas de segurança.
+# ============================================
+
+# Dependências já serão instaladas dentro do container
+node_modules
+
+# Variáveis de ambiente (cada ambiente tem as suas)
+.env
+.env.local
+.env.dev
+.env.prod
+
+# Código fonte compilado (vamos compilar dentro do container)
+dist
+
+# IDE e sistema
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Git
+.git
+.gitignore
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testes (não necessários em produção)
+coverage
