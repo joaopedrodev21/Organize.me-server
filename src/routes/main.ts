@@ -29,6 +29,11 @@ router.post("/auth/forgot-password", authController.forgotPassword);
 router.post("/auth/reset-password", authController.resetPassword);
 
 
+// Health Check (para o Render e Docker)
+router.get("/health", (req, res) => {
+  res.json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
 //Main Router:
 router.get("/", (req, res) => {
   res.send("API is running");
