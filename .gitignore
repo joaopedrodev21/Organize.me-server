@@ -6,7 +6,9 @@ dist/
 # Avoid accidental JS/Map emission inside src
 src/**/*.js
 src/**/*.js.map
-src/**/*.d.ts
 src/**/*.d.ts.map
+
+# Manually created type declarations (not compiler output)
+!src/types/*.d.ts
 
 /src/generated/prisma
