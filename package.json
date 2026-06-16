@@ -1,5 +1,5 @@
 {
-  "name": "manager-tasks-server",
+  "name": "Organize.me-server",
   "version": "1.0.0",
   "description": "Task management server built with Express and Prisma",
   "type": "module",
