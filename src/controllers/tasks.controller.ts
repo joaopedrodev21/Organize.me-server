@@ -1,20 +1,18 @@
 import { type NextFunction ,type Request, type Response } from "express";
-import { TaskRepository } from "../repositories/task.repository.js";
+import { TasksService } from "../services/tasks.service.js"; 
 import { createTaskSchema, updateTaskSchema } from "../schemas/task.schema.js";
 import { listTasksQuerySchema } from "../schemas/task.schema.js";
 
-const taskRepository = new TaskRepository();
+const taskService = new TasksService();
 
 export class TaskController {
-  async getAll(req: Request, res: Response, next: NextFunction) {
+  async getAllbyUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.id;
-      
       const query = listTasksQuerySchema.parse(req.query);
-
       const done = query.done === undefined ? undefined : query.done === "true";
 
-      const result = await taskRepository.getAllByUserWithFilters({
+      const result = await taskService.getAllByUser({
         userId,
         page: query.page,
         limit: query.limit,
@@ -34,17 +32,14 @@ export class TaskController {
       const validatedData = createTaskSchema.parse(req.body);
       const userId = req.user!.id;
 
-      const createData: any = {
+      const task = await taskService.create({
+        userId,
         title: validatedData.title,
+        description: validatedData.description,
         done: validatedData.done,
         priority: validatedData.priority,
-        user: { connect: { id: userId } },
-      };
-
-      if (validatedData.description !== undefined) createData.description = validatedData.description;
-      if (validatedData.dueDate !== undefined) createData.dueDate = validatedData.dueDate;
-
-      const task = await taskRepository.create(createData);
+        dueDate: validatedData.dueDate
+      });
       return res.status(201).json(task);
     } catch (error) {
       if (error instanceof Error) {
@@ -63,14 +58,10 @@ export class TaskController {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      const task = await taskRepository.getByIdAndUser(taskId, userId);
-      if (!task) {
-        return res.status(404).json({ message: "Tarefa não encontrada" });
-      }
-
+      const task = await taskService.getById(taskId, userId);
       return res.json(task);
     } catch (error) {
-      return res.status(500).json({ message: "Erro interno do servidor" });
+      return res.status(404).json({ message: (error as Error).message });
     }
   }
 
@@ -83,26 +74,9 @@ export class TaskController {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      const taskExists = await taskRepository.getByIdAndUser(taskId, userId);
-      if (!taskExists) {
-        return res.status(404).json({ message: "Tarefa não encontrada" });
-      }
-
       const validatedData = updateTaskSchema.parse(req.body);
-      const updateData: any = {};
 
-      if (validatedData.title !== undefined) updateData.title = validatedData.title;
-      if (validatedData.description !== undefined) updateData.description = validatedData.description;
-      if (validatedData.done !== undefined) updateData.done = validatedData.done;
-      if (validatedData.priority !== undefined) updateData.priority = validatedData.priority;
-      if (validatedData.dueDate !== undefined) updateData.dueDate = validatedData.dueDate;
-
-      const updateResult = await taskRepository.updateByIdAndUser(taskId, userId, updateData);
-      if (updateResult.count === 0) {
-        return res.status(404).json({ message: "Tarefa não encontrada" });
-      }
-
-      const updatedTask = await taskRepository.getByIdAndUser(taskId, userId);
+      const updatedTask = await taskService.update(taskId, userId, validatedData);
       return res.json(updatedTask);
     } catch (error) {
       if (error instanceof Error) {
@@ -121,22 +95,10 @@ export class TaskController {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      const task = await taskRepository.getByIdAndUser(taskId, userId);
-      if (!task) {
-        return res.status(404).json({ message: "Tarefa não encontrada" });
-      }
-
-      const deleteResult = await taskRepository.deleteByIdAndUser(taskId, userId);
-      if (deleteResult.count === 0) {
-        return res.status(404).json({ message: "Tarefa não encontrada" });
-      }
-
+      await taskService.delete(taskId, userId);
       return res.status(204).send();
     } catch (error) {
-      return next(error);
+      return res.status(404).json({ message: (error as Error).message });
     }
   }
 }
-
-
-
