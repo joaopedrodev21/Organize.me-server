@@ -11,7 +11,7 @@ const userController = new UserController();
 const authController = new AuthController();
 
 //Rotas de Tasks:
-router.get("/tasks", authMiddleware, taskController.getAll);
+router.get("/tasks", authMiddleware, taskController.getAllbyUser);
 router.post("/tasks", authMiddleware, taskController.create);
 router.get("/tasks/:id", authMiddleware, taskController.getById);
 router.put("/tasks/:id", authMiddleware, taskController.update);
