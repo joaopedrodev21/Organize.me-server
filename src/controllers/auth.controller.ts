@@ -1,7 +1,6 @@
 import { type NextFunction, type Request, type Response } from 'express';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas/auth.schema.js';
 import { AuthService } from '../services/auth.service.js';
-import { ca } from 'zod/locales';
 
 const authService = new AuthService();
 

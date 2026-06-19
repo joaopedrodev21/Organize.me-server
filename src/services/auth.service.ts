@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import jwt, { type SignOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { UserRepository } from "../repositories/user.repository.js";
@@ -42,22 +42,15 @@ export class AuthService {
     const smtpUser = process.env.SMTP_USER;
     const smtpPass = process.env.SMTP_PASS;
 
-    console.error("[forgotPassword] SMTP config:", {
-      host,
-      port,
-      smtpUser,
-      smtpPass: smtpPass ? `${smtpPass.substring(0, 4)}...` : "não definido",
-    });
-
     if (!host || !port || !smtpUser || !smtpPass) {
+      console.error("[forgotPassword] SMTP env vars missing:", { host, port, smtpUser, smtpPass: !!smtpPass });
       throw new AppError(
-        "Variáveis de ambiente SMTP não configuradas corretamente no servidor",
+        "Servidor de email não configurado",
         502
       );
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-
     const resetTokenExp = new Date(Date.now() + 60 * 60 * 1000);
 
     await userRepository.update(user.id, { resetToken, resetTokenExp });
@@ -73,30 +66,13 @@ export class AuthService {
       tls: {
         rejectUnauthorized: false,
       },
-      logger: true,
-      debug: true,
     });
-
-    try {
-      console.error("[forgotPassword] Verificando conexão SMTP...");
-      await transporter.verify();
-      console.error("[forgotPassword] Conexão SMTP verificada com sucesso!");
-    } catch (verifyError: any) {
-      console.error("[forgotPassword] ERRO na verificação SMTP:", verifyError);
-      throw new AppError(
-        `Falha na conexão com servidor de email: ${verifyError.message}`,
-        502
-      );
-    }
 
     const resetLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
 
-    const fromEmail = smtpUser;
-
     try {
-      console.error("[forgotPassword] Enviando email para:", user.email);
       await transporter.sendMail({
-        from: `"Organize.me" <${fromEmail}>`,
+        from: `"Organize.me" <${smtpUser}>`,
         to: user.email,
         subject: "Recuperação de Senha",
         html: `
@@ -106,11 +82,10 @@ export class AuthService {
           <p>Este link expira em 1 hora.</p>
         `
       });
-      console.error("[forgotPassword] Email enviado com sucesso!");
     } catch (mailError: any) {
-      console.error("[forgotPassword] ERRO ao enviar email:", mailError);
+      console.error("[forgotPassword] Erro ao enviar email:", mailError.message);
       throw new AppError(
-        `Falha ao enviar email: ${mailError.message}`,
+        "Erro ao enviar email de recuperação",
         502
       );
     }
