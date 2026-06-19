@@ -37,6 +37,25 @@ export class AuthService {
     const user = await userRepository.getByEmail(email);
     if (!user) return;
 
+    const host = process.env.EMAIL_HOST;
+    const port = process.env.EMAIL_PORT;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+
+    console.error("[forgotPassword] SMTP config:", {
+      host,
+      port,
+      smtpUser,
+      smtpPass: smtpPass ? `${smtpPass.substring(0, 4)}...` : "não definido",
+    });
+
+    if (!host || !port || !smtpUser || !smtpPass) {
+      throw new AppError(
+        "Variáveis de ambiente SMTP não configuradas corretamente no servidor",
+        502
+      );
+    }
+
     const resetToken = crypto.randomBytes(32).toString("hex");
 
     const resetTokenExp = new Date(Date.now() + 60 * 60 * 1000);
@@ -44,21 +63,26 @@ export class AuthService {
     await userRepository.update(user.id, { resetToken, resetTokenExp });
 
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: Number(process.env.EMAIL_PORT),
-      secure: Number(process.env.EMAIL_PORT) === 465,
+      host,
+      port: Number(port),
+      secure: Number(port) === 465,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: smtpUser,
+        pass: smtpPass,
       },
       tls: {
         rejectUnauthorized: false,
       },
+      logger: true,
+      debug: true,
     });
 
     try {
+      console.error("[forgotPassword] Verificando conexão SMTP...");
       await transporter.verify();
+      console.error("[forgotPassword] Conexão SMTP verificada com sucesso!");
     } catch (verifyError: any) {
+      console.error("[forgotPassword] ERRO na verificação SMTP:", verifyError);
       throw new AppError(
         `Falha na conexão com servidor de email: ${verifyError.message}`,
         502
@@ -67,9 +91,10 @@ export class AuthService {
 
     const resetLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
 
-    const fromEmail = process.env.SMTP_USER || "noreply@gmail.com";
+    const fromEmail = smtpUser;
 
     try {
+      console.error("[forgotPassword] Enviando email para:", user.email);
       await transporter.sendMail({
         from: `"Organize.me" <${fromEmail}>`,
         to: user.email,
@@ -81,7 +106,9 @@ export class AuthService {
           <p>Este link expira em 1 hora.</p>
         `
       });
+      console.error("[forgotPassword] Email enviado com sucesso!");
     } catch (mailError: any) {
+      console.error("[forgotPassword] ERRO ao enviar email:", mailError);
       throw new AppError(
         `Falha ao enviar email: ${mailError.message}`,
         502
