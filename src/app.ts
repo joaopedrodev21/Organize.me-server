@@ -6,9 +6,19 @@ import cors from "cors";
 
 const app = express();
 
+const normalizeOrigin = (url?: string) => url?.replace(/\/+$/, "") ?? undefined;
+const allowedOrigins = [normalizeOrigin(process.env.CLIENT_URL)].filter(Boolean);
+
 app.use(express.json());
 app.use(cors({
-  origin: process.env.CLIENT_URL || true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("CORS policy does not allow access from this origin."));
+  },
   credentials: true
 }));
 app.use('/', router);
