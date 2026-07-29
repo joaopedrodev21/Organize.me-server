@@ -11,10 +11,18 @@ describe("AuthService", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     process.env.JWT_SECRET = "test-secret";
+    process.env.EMAIL_HOST = "smtp.gmail.com";
+    process.env.EMAIL_PORT = "587";
+    process.env.SMTP_USER = "test@email.com";
+    process.env.SMTP_PASS = "test-password";
   });
 
   afterEach(() => {
     delete process.env.JWT_SECRET;
+    delete process.env.EMAIL_HOST;
+    delete process.env.EMAIL_PORT;
+    delete process.env.SMTP_USER;
+    delete process.env.SMTP_PASS;
   });
 
   it("register should create user when email is available", async () => {

@@ -27,7 +27,7 @@ services:  # Define os serviços (containers) que vão rodar
     # Variáveis de ambiente para configurar o PostgreSQL
     # O banco de dados, usuário e senha que serão criados
     environment:
-      POSTGRES_USER: organize_user
+      POSTGRES_USER: organize_joaop
       POSTGRES_PASSWORD: organize_pass
       POSTGRES_DB: organize_me_db
     
@@ -44,19 +44,19 @@ services:  # Define os serviços (containers) que vão rodar
     
     # Verifica se o banco está realmente pronto
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U organize_user -d organize_me_db"]
+      test: ["CMD-SHELL", "pg_isready -U organize_joaop -d organize_me_db"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   # ---------- SERVIÇO: aplicação Node ----------
-  app:
+  server:
     # Builda a imagem usando o Dockerfile que criamos
     build:
       context: .  # Define a pasta atual como contexto do build
       dockerfile: Dockerfile
     
-    container_name: organize-me-app
+    container_name: organize-me-server
     
     # Depende do banco (só sobe depois do db estar pronto)
     depends_on:
@@ -72,7 +72,7 @@ services:  # Define os serviços (containers) que vão rodar
     environment:
       # A URL DEVE usar o nome do serviço "db" como host!
       # O Docker Compose cria um DNS interno com os nomes dos serviços
-      DATABASE_URL: "postgresql://organize_user:organize_pass@db:5432/organize_me_db"
+      DATABASE_URL: "postgresql://organize_joaop:organize_pass@db:5432/organize_me_db"
       PORT: "3000"
       JWT_SECRET: "dev-secret-key-nao-use-em-producao"
       JWT_EXPIRES_IN: "1h"
