@@ -470,18 +470,6 @@ O `docker-compose.yml` orquestra **dois serviços**:
 | `npm run docker:rebuild` | Rebuild e subir containers |
 
 ---
-
-## Roadmap
-
-- [ ] Frontend web (React + Vite)
-- [ ] Dashboard com métricas de produtividade em tempo real
-- [ ] Projetos e times (multi-usuário)
-- [ ] WebSockets para atualizações em tempo real
-- [ ] Rate limiting e proteção contra brute force
-- [ ] Refresh tokens e revogação de sessão
-- [ ] CI/CD pipeline com GitHub Actions
-- [ ] Deploy automatizado no Render
-
 ---
 
 ## Autor
