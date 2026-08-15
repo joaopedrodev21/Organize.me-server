@@ -24,7 +24,11 @@ app.use(cors({
   credentials: true
 }));
 app.use('/', router);
-setupSwagger(app);
+
+if (process.env.NODE_ENV !== "production") {
+  setupSwagger(app);
+}
+
 app.use(errorMiddleware);
 
 export default app;

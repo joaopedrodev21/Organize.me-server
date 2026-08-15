@@ -236,8 +236,7 @@ A API possui documentação interativa gerada automaticamente com **Swagger (Ope
 
 | Ambiente | URL |
 |----------|-----|
-| **Local** | `http://localhost:3000/api/docs` |
-| **Produção** | `https://organize-me-server-apeo.onrender.com/api/docs` |
+| **Local (desenvolvimento)** | `http://localhost:3000/api/docs` |
 
 ### Spec OpenAPI (JSON)
 
@@ -245,8 +244,7 @@ A spec completa em formato JSON pode ser baixada para uso em ferramentas como **
 
 | Ambiente | URL |
 |----------|-----|
-| **Local** | `http://localhost:3000/api/docs.json` |
-| **Produção** | `https://organize-me-server-apeo.onrender.com/api/docs.json` |
+| **Local (desenvolvimento)** | `http://localhost:3000/api/docs.json` |
 
 ### Recursos da documentação
 
@@ -282,6 +280,8 @@ src/docs/
 4. A spec JSON fica disponível em `/api/docs.json`
 
 > **Nota:** A documentação é gerada automaticamente a cada deploy — não é necessário atualizá-la manualmente. Ao adicionar novos endpoints, basta documentá-los nos arquivos de `src/docs/`.
+
+> **⚠️ Segurança:** O Swagger está **desabilitado em produção** (`NODE_ENV=production`) para evitar exposição indevida da API. Ele fica disponível apenas em desenvolvimento.
 
 ---
 
