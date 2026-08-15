@@ -4,10 +4,6 @@
 
 ### Plataforma full stack para gerenciamento de projetos e métricas de produtividade em tempo real.
 
-![Organize.me Dashboard](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Organize.me+Dashboard)
-
-![Organize.me Landing Page](https://via.placeholder.com/1200x600/16213e/ffffff?text=Organize.me+Landing+Page)
-
 ---
 
 **Stack:** Node.js · TypeScript · Express · Prisma ORM · PostgreSQL · Docker · Vitest
@@ -470,18 +466,6 @@ O `docker-compose.yml` orquestra **dois serviços**:
 | `npm run docker:rebuild` | Rebuild e subir containers |
 
 ---
-
-## Roadmap
-
-- [ ] Frontend web (React + Vite)
-- [ ] Dashboard com métricas de produtividade em tempo real
-- [ ] Projetos e times (multi-usuário)
-- [ ] WebSockets para atualizações em tempo real
-- [ ] Rate limiting e proteção contra brute force
-- [ ] Refresh tokens e revogação de sessão
-- [ ] CI/CD pipeline com GitHub Actions
-- [ ] Deploy automatizado no Render
-
 ---
 
 ## Autor
