@@ -4,10 +4,6 @@
 
 ### Plataforma full stack para gerenciamento de projetos e métricas de produtividade em tempo real.
 
-![Organize.me Dashboard](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Organize.me+Dashboard)
-
-![Organize.me Landing Page](https://via.placeholder.com/1200x600/16213e/ffffff?text=Organize.me+Landing+Page)
-
 ---
 
 **Stack:** Node.js · TypeScript · Express · Prisma ORM · PostgreSQL · Docker · Vitest
@@ -28,7 +24,7 @@ O **Organize.me** é uma plataforma full stack projetada para transformar a form
 
 | Recurso | Implementação |
 |---------|---------------|
-| **Autenticação Stateless** | Tokens **JWT** (JSON Web Tokens) com expiração configurável, validados em middleware dedicado |
+| **Autenticação Stateless** | Tokens **JWT** (JSON Web Tokens) com expiração de 1 hora, validados em middleware dedicado |
 | **Hash de Senhas** | **bcrypt** com salt rounds (10) — senhas nunca armazenadas em texto puro |
 | **Validação Rígida de Dados** | **Zod** schemas em todas as rotas (DTOs) — validação de entrada antes de qualquer operação no banco |
 | **Proteção de Rotas** | Middleware `authMiddleware` protege todas as rotas de usuários e tarefas |
@@ -135,6 +131,7 @@ Organize.me-server/
 ├── src/
 │   ├── controllers/         # Camada de controllers (HTTP)
 │   ├── database/            # Cliente Prisma
+│   ├── docs/                # Configuração do Swagger (API Docs)
 │   ├── middlewares/         # Auth e tratamento de erros
 │   ├── repositories/        # Camada de acesso a dados
 │   ├── routes/              # Definição de rotas
@@ -147,7 +144,10 @@ Organize.me-server/
 │   └── index.ts             # Entry point
 ├── Dockerfile               # Multi-stage build
 ├── docker-compose.yml       # Orquestração de containers
+├── tsconfig.json            # Configuração do TypeScript
 ├── .env.example             # Variáveis de ambiente de exemplo
+├── .dockerignore            # Arquivos ignorados no build Docker
+├── .gitignore               # Arquivos ignorados pelo Git
 └── package.json
 ```
 
@@ -175,9 +175,10 @@ JWT_SECRET="your_jwt_secret_key"
 JWT_EXPIRES_IN="1h"
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-SMTP_USER=seuemail@gmail.com
-SMTP_PASS=sua_senha_de_app
+SMTP_USER=your_user
+SMTP_PASS=your_pass
 CLIENT_URL=http://localhost:5173
+API_URL=http://localhost:3000
 ```
 
 ### 3) Instale as dependências
@@ -254,11 +255,12 @@ npm start
 | `PUT` | `/tasks/:id` | Atualizar tarefa |
 | `DELETE` | `/tasks/:id` | Remover tarefa |
 
-### Health Check
+### Health Check & Raiz
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| `GET` | `/health` | Status da API |
+| `GET` | `/` | Mensagem de confirmação da API (`API is running`) |
+| `GET` | `/health` | Status da API (`{ status: "OK", timestamp }`) |
 
 ---
 
@@ -444,12 +446,12 @@ O `docker-compose.yml` orquestra **dois serviços**:
 | Serviço | Container | Porta | Descrição |
 |---------|-----------|-------|-----------|
 | `db` | `organize-me-db` | `5432` | PostgreSQL 16 Alpine com volume persistente |
-| `app` | `organize-me-app` | `3000` | API Node.js com multi-stage build |
+| `server` | `organize-me-server` | `3000` | API Node.js com multi-stage build |
 
 **Fluxo de inicialização:**
 
 1. Container `db` sobe e executa healthcheck (`pg_isready`)
-2. Container `app` aguarda o banco ficar saudável (`service_healthy`)
+2. Container `server` aguarda o banco ficar saudável (`service_healthy`)
 3. Migrations são aplicadas automaticamente (`prisma migrate deploy`)
 4. Servidor inicia (`node dist/index.js`)
 
@@ -468,19 +470,6 @@ O `docker-compose.yml` orquestra **dois serviços**:
 | `npm run docker:down` | Parar e remover containers |
 | `npm run docker:logs` | Ver logs em tempo real |
 | `npm run docker:rebuild` | Rebuild e subir containers |
-
----
-
-## Roadmap
-
-- [ ] Frontend web (React + Vite)
-- [ ] Dashboard com métricas de produtividade em tempo real
-- [ ] Projetos e times (multi-usuário)
-- [ ] WebSockets para atualizações em tempo real
-- [ ] Rate limiting e proteção contra brute force
-- [ ] Refresh tokens e revogação de sessão
-- [ ] CI/CD pipeline com GitHub Actions
-- [ ] Deploy automatizado no Render
 
 ---
 
