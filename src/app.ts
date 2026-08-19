@@ -3,13 +3,11 @@ import express from 'express';
 import router from "./routes/main.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import cors from "cors";
-import { setupSwagger } from "./docs/swagger.config.js";
 
 const app = express();
 
 const normalizeOrigin = (url?: string) => url?.replace(/\/+$/, "") ?? undefined;
-const apiUrl = normalizeOrigin(process.env.API_URL) ?? "http://localhost:3000";
-const allowedOrigins = [normalizeOrigin(process.env.CLIENT_URL), apiUrl].filter(Boolean);
+const allowedOrigins = [normalizeOrigin(process.env.CLIENT_URL)].filter(Boolean);
 
 app.use(express.json());
 app.use(cors({
@@ -24,11 +22,6 @@ app.use(cors({
   credentials: true
 }));
 app.use('/', router);
-
-if (process.env.NODE_ENV !== "production") {
-  setupSwagger(app);
-}
-
 app.use(errorMiddleware);
 
 export default app;

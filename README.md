@@ -4,6 +4,10 @@
 
 ### Plataforma full stack para gerenciamento de projetos e métricas de produtividade em tempo real.
 
+![Organize.me Dashboard](https://via.placeholder.com/1200x600/1a1a2e/ffffff?text=Organize.me+Dashboard)
+
+![Organize.me Landing Page](https://via.placeholder.com/1200x600/16213e/ffffff?text=Organize.me+Landing+Page)
+
 ---
 
 **Stack:** Node.js · TypeScript · Express · Prisma ORM · PostgreSQL · Docker · Vitest
@@ -117,7 +121,6 @@ O **Organize.me** é uma plataforma full stack projetada para transformar a form
 | **Segurança** | bcrypt |
 | **Email** | Nodemailer |
 | **Testes** | Vitest |
-| **Documentação** | Swagger (OpenAPI 3.0) + swagger-ui-express |
 | **Containerização** | Docker + Docker Compose |
 
 ---
@@ -132,11 +135,6 @@ Organize.me-server/
 ├── src/
 │   ├── controllers/         # Camada de controllers (HTTP)
 │   ├── database/            # Cliente Prisma
-│   ├── docs/                # Documentação Swagger/OpenAPI
-│   │   ├── paths/           # Definição dos endpoints (paths)
-│   │   ├── schemas/         # Modelos de dados reutilizáveis
-│   │   ├── swagger.config.ts # Geração da spec + setup da UI
-│   │   └── swagger.options.ts # Configuração base (info, servers, security)
 │   ├── middlewares/         # Auth e tratamento de erros
 │   ├── repositories/        # Camada de acesso a dados
 │   ├── routes/              # Definição de rotas
@@ -180,7 +178,6 @@ EMAIL_PORT=587
 SMTP_USER=seuemail@gmail.com
 SMTP_PASS=sua_senha_de_app
 CLIENT_URL=http://localhost:5173
-API_URL=http://localhost:3000
 ```
 
 ### 3) Instale as dependências
@@ -225,63 +222,6 @@ Servidor disponível em: `http://localhost:3000`
 npm run build
 npm start
 ```
-
----
-
-## Documentação da API (Swagger)
-
-A API possui documentação interativa gerada automaticamente com **Swagger (OpenAPI 3.0)**.
-
-### Acessar a documentação
-
-| Ambiente | URL |
-|----------|-----|
-| **Local (desenvolvimento)** | `http://localhost:3000/api/docs` |
-
-### Spec OpenAPI (JSON)
-
-A spec completa em formato JSON pode ser baixada para uso em ferramentas como **Postman** ou **Insomnia**:
-
-| Ambiente | URL |
-|----------|-----|
-| **Local (desenvolvimento)** | `http://localhost:3000/api/docs.json` |
-
-### Recursos da documentação
-
-- **12 endpoints** documentados (Auth, Tasks, Users, Health)
-- **13 schemas** reutilizáveis (User, Task, LoginResponse, ErrorResponse, etc.)
-- **Autenticação JWT** integrada — botão "Authorize" para inserir o token
-- **Teste direto** — botão "Try it out" para executar requisições pela UI
-- **Explorer** habilitado para navegar entre versões da spec
-
-### Estrutura da documentação
-
-```txt
-src/docs/
-├── paths/                    # Definição dos endpoints
-│   ├── auth.docs.ts          # POST /auth/register, /login, /forgot-password, /reset-password
-│   ├── tasks.docs.ts         # CRUD de /tasks e /tasks/:id
-│   ├── users.docs.ts         # GET/PUT/DELETE /users/me
-│   └── health.docs.ts        # GET /health
-├── schemas/                  # Modelos de dados reutilizáveis
-│   ├── auth.schema.docs.ts   # RegisterInput, LoginInput, LoginResponse, etc.
-│   ├── task.schema.docs.ts   # Task, CreateTaskInput, UpdateTaskInput, TaskListResponse
-│   ├── user.schema.docs.ts   # User, UpdateUserInput
-│   └── error.schema.docs.ts  # ErrorResponse
-├── swagger.config.ts         # Geração da spec + setup da UI
-└── swagger.options.ts        # Configuração base (info, servers, securitySchemes)
-```
-
-### Como funciona
-
-1. O `swagger-jsdoc` lê os comentários `@openapi` dos arquivos em `src/docs/`
-2. Gera a spec OpenAPI 3.0.3 em tempo de execução
-3. O `swagger-ui-express` serve a interface interativa em `/api/docs`
-4. A spec JSON fica disponível em `/api/docs.json`
-
-> **Nota:** A documentação é gerada automaticamente a cada deploy — não é necessário atualizá-la manualmente. Ao adicionar novos endpoints, basta documentá-los nos arquivos de `src/docs/`.
-
-> **⚠️ Segurança:** O Swagger está **desabilitado em produção** (`NODE_ENV=production`) para evitar exposição indevida da API. Ele fica disponível apenas em desenvolvimento.
 
 ---
 
@@ -530,6 +470,18 @@ O `docker-compose.yml` orquestra **dois serviços**:
 | `npm run docker:rebuild` | Rebuild e subir containers |
 
 ---
+
+## Roadmap
+
+- [ ] Frontend web (React + Vite)
+- [ ] Dashboard com métricas de produtividade em tempo real
+- [ ] Projetos e times (multi-usuário)
+- [ ] WebSockets para atualizações em tempo real
+- [ ] Rate limiting e proteção contra brute force
+- [ ] Refresh tokens e revogação de sessão
+- [ ] CI/CD pipeline com GitHub Actions
+- [ ] Deploy automatizado no Render
+
 ---
 
 ## Autor
