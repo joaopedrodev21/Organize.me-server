@@ -118,6 +118,7 @@ O **Organize.me** é uma plataforma full stack projetada para transformar a form
 | **Email** | Nodemailer |
 | **Testes** | Vitest |
 | **Containerização** | Docker + Docker Compose |
+| **Documentação API** | Swagger UI (swagger-jsdoc + swagger-ui-express) |
 
 ---
 
@@ -131,7 +132,19 @@ Organize.me-server/
 ├── src/
 │   ├── controllers/         # Camada de controllers (HTTP)
 │   ├── database/            # Cliente Prisma
-│   ├── docs/                # Configuração do Swagger (API Docs)
+│   ├── docs/
+│   │   ├── swagger.config.ts       # Configuração e setup do Swagger
+│   │   ├── swagger.options.ts      # Opções OpenAPI (info, servers, tags, security)
+│   │   ├── paths/                  # Definições de endpoints (Swagger paths)
+│   │   │   ├── auth.docs.ts
+│   │   │   ├── tasks.docs.ts
+│   │   │   ├── users.docs.ts
+│   │   │   └── health.docs.ts
+│   │   └── schemas/                # Schemas reutilizáveis (Swagger schemas)
+│   │       ├── auth.schema.docs.ts
+│   │       ├── error.schema.docs.ts
+│   │       ├── task.schema.docs.ts
+│   │       └── user.schema.docs.ts
 │   ├── middlewares/         # Auth e tratamento de erros
 │   ├── repositories/        # Camada de acesso a dados
 │   ├── routes/              # Definição de rotas
@@ -222,6 +235,56 @@ Servidor disponível em: `http://localhost:3000`
 ```bash
 npm run build
 npm start
+```
+
+---
+
+## Documentação da API (Swagger)
+
+A API está documentada automaticamente usando **Swagger / OpenAPI 3.0.3**, gerado a partir dos arquivos de rota e controllers via `swagger-jsdoc`. A interface interativa do **Swagger UI** está integrada e pronta para uso.
+
+### Endpoints de Documentação
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| `GET` | `/api/docs` | Interface Swagger UI interativa (documentação visual) |
+| `GET` | `/api/docs.json` | Especificação OpenAPI em formato JSON (raw) |
+
+### Funcionalidades do Swagger UI
+
+- **Explorador interativo** — teste endpoints diretamente no navegador
+- **persistAuthorization** — o token JWT inserido é mantido entre requisições
+- **Organização por tags** — endpoints agrupados por: `Auth`, `Tasks`, `Users`, `Health`
+- **Esquema de segurança BearerAuth** — autenticação JWT via header `Authorization: Bearer <token>`
+- **Validação de schema** — modelos de request/response exibidos com exemplos
+
+### Como usar
+
+1. Inicie a aplicação (`npm run dev` ou `npm run docker:up`)
+2. Acesse [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+3. Navegue pelos endpoints documentados
+4. Para endpoints protegidos, clique em **"Authorize"** e insira seu token JWT:
+   ```
+   Bearer <seu-token-jwt>
+   ```
+5. Clique em qualquer endpoint para expandir e testar com o botão **"Try it out"**
+
+### Estrutura de arquivos Swagger
+
+```txt
+src/docs/
+├── swagger.config.ts      # Setup do Swagger UI + serviço JSON
+├── swagger.options.ts     # Configurações base (title, versão, servers, tags, security)
+├── paths/                 # Documentação de cada endpoint
+│   ├── auth.docs.ts       # /auth/register, /auth/login, /auth/forgot-password, /auth/reset-password
+│   ├── tasks.docs.ts      # /tasks (CRUD completo)
+│   ├── users.docs.ts      # /users/me (GET, PUT, DELETE)
+│   └── health.docs.ts     # /health
+└── schemas/               # Modelos reutilizáveis
+    ├── auth.schema.docs.ts
+    ├── error.schema.docs.ts
+    ├── task.schema.docs.ts
+    └── user.schema.docs.ts
 ```
 
 ---

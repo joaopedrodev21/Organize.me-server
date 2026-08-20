@@ -3,6 +3,7 @@ import express from 'express';
 import router from "./routes/main.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import cors from "cors";
+import { setupSwagger } from "./docs/swagger.config.js";
 
 const app = express();
 
@@ -21,6 +22,10 @@ app.use(cors({
   },
   credentials: true
 }));
+
+// Swagger API Documentation
+setupSwagger(app);
+
 app.use('/', router);
 app.use(errorMiddleware);
 
